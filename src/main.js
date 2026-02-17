@@ -728,10 +728,10 @@ function updateSelectionLabel() {
 // makeBtn("Rotate Picked Face Prime (Arrow Left)", () => rotatePickedFace(true));
 
 // makeHeader("Cube Navigation");
-// makeBtn("Spin Left (A)", () => enqueueCubeNav("y", -1));
-// makeBtn("Spin Right (D)", () => enqueueCubeNav("y", +1));
-// makeBtn("Flip Over (W)", () => enqueueCubeNav("x", -1));
-// makeBtn("Flip Back (S)", () => enqueueCubeNav("x", +1));
+makeBtn("Spin Left (A)", () => enqueueCubeNav("y", -1));
+makeBtn("Spin Right (D)", () => enqueueCubeNav("y", +1));
+makeBtn("Flip Over (W)", () => enqueueCubeNav("x", -1));
+makeBtn("Flip Back (S)", () => enqueueCubeNav("x", +1));
 
 const scrambleBtn = document.createElement("button");
 scrambleBtn.textContent = "Scramble";
