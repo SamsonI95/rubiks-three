@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>rubiks-three</title>
+    <title>Rubik's Cube Solver - Tutorial</title>
     <style>
       html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0f14; }
       canvas { display: block; }
@@ -12,6 +12,52 @@
   </head>
   <body>
     <div id="app"></div>
+
+    <!-- Tutorial Panel -->
+    <div id="tutorial-panel" class="tutorial-panel">
+      <div class="tutorial-header">
+        <h1 class="tutorial-title">Rubik's Cube Tutorial</h1>
+        <button id="tutorial-close" class="tutorial-close-btn" aria-label="Close panel">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Progress Indicator -->
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <p id="progress-text" class="progress-text">Step 1 of 10</p>
+      </div>
+
+      <!-- Content Area -->
+      <div id="tutorial-content" class="tutorial-content"></div>
+
+      <!-- Navigation Buttons -->
+      <div class="tutorial-navigation">
+        <button id="prev-btn" class="nav-btn prev-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Previous
+        </button>
+        <button id="next-btn" class="nav-btn next-btn">
+          Next
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tutorial Toggle Button (Mobile) -->
+    <button id="tutorial-toggle" class="tutorial-toggle-btn" aria-label="Toggle tutorial">
+      ?
+    </button>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

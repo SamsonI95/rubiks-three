@@ -852,6 +852,388 @@ async function scramble(moves = 20) {
 
 scrambleBtn.addEventListener("click", () => scramble(25));
 
+// ---------------------------------------------------------
+// Tutorial System
+// ---------------------------------------------------------
+
+const TUTORIAL_LESSONS = [
+  {
+    id: 1,
+    title: "Right Hand Rule",
+    category: "Fundamentals",
+    description: "Learn the right hand rule, which is essential for executing cube turns efficiently.",
+    content: `
+      <div class="step-section">
+        <p class="step-description">The right hand rule is the foundation for understanding cube rotations. Your right hand's position and movement determine how the cube or its slices rotate.</p>
+
+        <div class="tip-box">
+          <p class="tip-label">💡 Key Concept</p>
+          <p class="tip-text">Point your right thumb in the direction of the rotation axis. Your fingers curl in the direction of the positive rotation.</p>
+        </div>
+      </div>
+
+      <div class="step-section">
+        <p class="step-section-title">How to Apply It</p>
+        <p class="step-description">When rotating a face:</p>
+        <ol style="margin: 8px 0; padding-left: 20px; color: var(--tutorial-text-muted); font-size: 13px; line-height: 1.6;">
+          <li>Point your right thumb toward the face you're rotating (away from you)</li>
+          <li>Your fingers naturally curl in the direction of a clockwise turn</li>
+          <li>This clockwise direction is the standard "no-prime" move</li>
+        </ol>
+      </div>
+    `
+  },
+  {
+    id: 2,
+    title: "Left Hand Rule",
+    category: "Fundamentals",
+    description: "Learn the left hand rule for rotating faces on the opposite side of the cube.",
+    content: `
+      <div class="step-section">
+        <p class="step-description">The left hand rule applies to faces you can't easily reach with your right hand. It's the mirror of the right hand rule.</p>
+
+        <div class="tip-box">
+          <p class="tip-label">💡 Key Concept</p>
+          <p class="tip-text">Point your left thumb toward the face. Your left fingers curl in the direction of rotation when viewing from that side.</p>
+        </div>
+      </div>
+
+      <div class="step-section">
+        <p class="step-section-title">Common Left-Hand Moves</p>
+        <ul style="margin: 8px 0; padding-left: 20px; color: var(--tutorial-text-muted); font-size: 13px; line-height: 1.6;">
+          <li><strong>L</strong> - Left face clockwise (from the left side's perspective)</li>
+          <li><strong>L'</strong> - Left face counter-clockwise</li>
+          <li><strong>B</strong> - Back face clockwise</li>
+          <li><strong>B'</strong> - Back face counter-clockwise</li>
+        </ul>
+      </div>
+    `
+  },
+  {
+    id: 3,
+    title: "Cube Positioning & Directions",
+    category: "Fundamentals",
+    description: "Understand the standard cube orientation and directional notation.",
+    content: `
+      <div class="step-section">
+        <p class="step-description">The cube has a standard orientation used globally. Learning these directions helps you follow tutorials from any source.</p>
+
+        <div class="step-section-title">The Six Faces</div>
+        <ul style="margin: 8px 0; padding-left: 20px; color: var(--tutorial-text-muted); font-size: 13px; line-height: 1.6;">
+          <li><strong>White (W)</strong> - Bottom face</li>
+          <li><strong>Yellow (Y)</strong> - Top face (opposite white)</li>
+          <li><strong>Red (R)</strong> - Right face</li>
+          <li><strong>Orange (O)</strong> - Left face (opposite red)</li>
+          <li><strong>Blue (B)</strong> - Front face</li>
+          <li><strong>Green (G)</strong> - Back face (opposite blue)</li>
+        </ul>
+      </div>
+
+      <div class="tip-box">
+        <p class="tip-label">🎯 Remember</p>
+        <p class="tip-text">White and Yellow are opposite. Red and Orange are opposite. Blue and Green are opposite.</p>
+      </div>
+    `
+  },
+  {
+    id: 4,
+    title: "The White Cross",
+    category: "Solving Steps",
+    description: "Create a white cross on the bottom of the cube. This is the first step in solving the cube.",
+    content: `
+      <div class="step-section">
+        <p class="step-description">The white cross is your foundation. This step requires no algorithms—just intuition and patience. Find the four white edge pieces and position them to form a cross on the white face.</p>
+
+        <div class="tip-box">
+          <p class="tip-label">⚠️ Important</p>
+          <p class="tip-text">The edge pieces in the cross must also match the center color of their respective faces (front, right, back, left).</p>
+        </div>
+      </div>
+
+      <div class="step-section">
+        <p class="step-section-title">Steps to Follow</p>
+        <ol style="margin: 8px 0; padding-left: 20px; color: var(--tutorial-text-muted); font-size: 13px; line-height: 1.6;">
+          <li>Find a white edge piece (has white and one other color)</li>
+          <li>Move it to the white face</li>
+          <li>Align the other color with its center</li>
+          <li>Repeat for all four white edges</li>
+        </ol>
+      </div>
+    `
+  },
+  {
+    id: 5,
+    title: "Solving the Bottom Two Layers",
+    category: "Solving Steps",
+    description: "Complete the white face and its adjacent middle layer.",
+    content: `
+      <div class="step-section">
+        <p class="step-description">Once your white cross is complete, fill in the white corners and the middle layer edges. This keeps the white face intact while building upward.</p>
+
+        <div class="step-section-title">Insert White Corners</div>
+        <p class="step-description">Find white corner pieces and insert them into their correct positions, matching all three colors.</p>
+
+        <div class="notation-box">
+          <span class="notation-label">Common Algorithm for corners:</span>
+          R U R' U'
+        </div>
+      </div>
+
+      <div class="step-section">
+        <p class="step-section-title">Insert Middle Layer Edges</p>
+        <p class="step-description">Now fill the middle layer with edge pieces that don't have yellow on them.</p>
+
+        <div class="notation-box">
+          <span class="notation-label">Common algorithms:</span>
+          U R U' R' U' F' U F
+        </div>
+      </div>
+    `
+  },
+  {
+    id: 6,
+    title: "Getting the Yellow Cross",
+    category: "Solving Steps",
+    description: "Create a cross on the top (yellow) face, ignoring corner positions.",
+    content: `
+      <div class="step-section">
+        <p class="step-description">Now focus on the top layer. First, get all yellow edges facing up without worrying about whether they match their side colors.</p>
+
+        <div class="tip-box">
+          <p class="tip-label">🎯 Goal</p>
+          <p class="tip-text">You should see a yellow cross on top, even if the edges aren't in their final positions.</p>
+        </div>
+      </div>
+
+      <div class="step-section">
+        <p class="step-section-title">The F R U R' U' F' Algorithm</p>
+        <p class="step-description">Use this sequence to flip edges if they're not facing up:</p>
+
+        <div class="notation-box">
+          F R U R' U' F'
+        </div>
+
+        <p class="step-description" style="margin-top: 12px;">Repeat this algorithm until you have a yellow cross on top.</p>
+      </div>
+    `
+  },
+  {
+    id: 7,
+    title: "Matching Yellow Edge Pieces",
+    category: "Solving Steps",
+    description: "Position the yellow edge pieces so each one matches its adjacent center color.",
+    content: `
+      <div class="step-section">
+        <p class="step-description">You have a yellow cross, but the edges might be in the wrong positions. Rotate the top layer until at least one edge matches its front face center color.</p>
+
+        <div class="tip-box">
+          <p class="tip-label">💡 Tip</p>
+          <p class="tip-text">Look for an edge that's already in the correct position. If all four are wrong, do one algorithm and check again.</p>
+        </div>
+      </div>
+
+      <div class="step-section">
+        <p class="step-section-title">The R U R' U R U2 R' Algorithm</p>
+        <p class="step-description">This cycles three edge pieces around the top. Repeat until all edges match:</p>
+
+        <div class="notation-box">
+          R U R' U R U2 R'
+        </div>
+      </div>
+    `
+  },
+  {
+    id: 8,
+    title: "Matching Yellow Corner Pieces",
+    category: "Solving Steps",
+    description: "Get all yellow corner pieces to their correct positions (but not necessarily facing up).",
+    content: `
+      <div class="step-section">
+        <p class="step-description">Now position the yellow corner pieces. They should be in their correct positions relative to the cube's sides, even if they're twisted.</p>
+
+        <div class="tip-box">
+          <p class="tip-label">🎯 Goal</p>
+          <p class="tip-text">Each corner should match all three colors of its position, even if it's not correctly oriented yet.</p>
+        </div>
+      </div>
+
+      <div class="step-section">
+        <p class="step-section-title">The U R U' L' U R' U' L Algorithm</p>
+        <p class="step-description">This algorithm cycles three corner pieces. Look for one already in position, then use this to place the others:</p>
+
+        <div class="notation-box">
+          U R U' L' U R' U' L
+        </div>
+      </div>
+    `
+  },
+  {
+    id: 9,
+    title: "Orienting Yellow Corner Pieces",
+    category: "Solving Steps",
+    description: "Twist the corner pieces so yellow faces up on all of them.",
+    content: `
+      <div class="step-section">
+        <p class="step-description">You're almost done! Now twist each corner piece so the yellow sticker faces up. This is the trickiest step but uses just one algorithm repeated.</p>
+
+        <div class="tip-box">
+          <p class="tip-label">⚠️ Important</p>
+          <p class="tip-text">Use the algorithm below, and don't be alarmed if the cube looks scrambled—it will come together once you finish all corners.</p>
+        </div>
+      </div>
+
+      <div class="step-section">
+        <p class="step-section-title">The R' D' R D Algorithm</p>
+        <p class="step-description">Position a corner that needs fixing in the front-right position, then repeat until it's correct. Do NOT rotate the cube—just repeat the algorithm:</p>
+
+        <div class="notation-box">
+          R' D' R D (repeat 2-3 times)
+        </div>
+
+        <p class="step-description" style="margin-top: 12px;">Then rotate the top layer to bring the next wrong corner to the front-right position and repeat.</p>
+      </div>
+    `
+  },
+  {
+    id: 10,
+    title: "Congratulations! 🎉",
+    category: "Complete",
+    description: "You've solved the cube!",
+    content: `
+      <div class="step-section">
+        <p class="step-description" style="font-size: 15px; line-height: 1.7;">You've successfully completed the Rubik's Cube! You now understand the fundamental techniques used in cubing.</p>
+
+        <div class="tip-box">
+          <p class="tip-label">🚀 Next Steps</p>
+          <p class="tip-text">Practice these moves until they become muscle memory. Try timing yourself to see how fast you can solve. Then explore advanced techniques and speedcubing methods!</p>
+        </div>
+      </div>
+
+      <div class="step-section" style="margin-top: 24px;">
+        <p class="step-section-title">Key Algorithms to Memorize</p>
+        <ul style="margin: 8px 0; padding-left: 20px; color: var(--tutorial-text-muted); font-size: 12px; line-height: 1.8;">
+          <li>White Cross: Intuitive</li>
+          <li>Bottom two layers: R U R' U' and variations</li>
+          <li>Yellow Cross: F R U R' U' F'</li>
+          <li>Yellow Edges: R U R' U R U2 R'</li>
+          <li>Yellow Corners: U R U' L' U R' U' L</li>
+          <li>Corner Orientation: R' D' R D</li>
+        </ul>
+      </div>
+    `
+  }
+];
+
+class TutorialManager {
+  constructor() {
+    this.currentStep = 0;
+    this.lessons = TUTORIAL_LESSONS;
+    this.panelHidden = false;
+    this.init();
+  }
+
+  init() {
+    this.setupElements();
+    this.setupEventListeners();
+    this.renderStep(0);
+    this.updateProgress();
+  }
+
+  setupElements() {
+    this.panel = document.getElementById('tutorial-panel');
+    this.content = document.getElementById('tutorial-content');
+    this.progressFill = document.getElementById('progress-fill');
+    this.progressText = document.getElementById('progress-text');
+    this.prevBtn = document.getElementById('prev-btn');
+    this.nextBtn = document.getElementById('next-btn');
+    this.closeBtn = document.getElementById('tutorial-close');
+    this.toggleBtn = document.getElementById('tutorial-toggle');
+  }
+
+  setupEventListeners() {
+    this.prevBtn.addEventListener('click', () => this.previousStep());
+    this.nextBtn.addEventListener('click', () => this.nextStep());
+    this.closeBtn.addEventListener('click', () => this.togglePanel());
+    this.toggleBtn.addEventListener('click', () => this.togglePanel());
+    window.addEventListener('resize', () => this.handleResize());
+  }
+
+  renderStep(index) {
+    const lesson = this.lessons[index];
+    const stepNumber = index + 1;
+    const totalSteps = this.lessons.length;
+
+    let categoryLabel = '';
+    if (lesson.category === 'Fundamentals') {
+      categoryLabel = '📚 Fundamentals';
+    } else if (lesson.category === 'Solving Steps') {
+      categoryLabel = '🎯 Solving Step';
+    } else if (lesson.category === 'Complete') {
+      categoryLabel = '✅ Complete';
+    }
+
+    this.content.innerHTML = `
+      <div class="step-card">
+        <p class="step-label">${categoryLabel}</p>
+        <h2 class="step-title">${lesson.title}</h2>
+        <p class="step-description">${lesson.description}</p>
+        ${lesson.content}
+      </div>
+    `;
+
+    // Scroll to top
+    this.content.scrollTop = 0;
+
+    // Update button states
+    this.prevBtn.disabled = index === 0;
+    this.nextBtn.disabled = index === this.lessons.length - 1;
+  }
+
+  updateProgress() {
+    const totalSteps = this.lessons.length;
+    const progressPercent = ((this.currentStep + 1) / totalSteps) * 100;
+
+    this.progressFill.style.width = progressPercent + '%';
+    this.progressText.textContent = `Step ${this.currentStep + 1} of ${totalSteps}`;
+  }
+
+  nextStep() {
+    if (this.currentStep < this.lessons.length - 1) {
+      this.currentStep++;
+      this.renderStep(this.currentStep);
+      this.updateProgress();
+    }
+  }
+
+  previousStep() {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+      this.renderStep(this.currentStep);
+      this.updateProgress();
+    }
+  }
+
+  togglePanel() {
+    this.panelHidden = !this.panelHidden;
+    if (this.panelHidden) {
+      this.panel.classList.add('hidden');
+    } else {
+      this.panel.classList.remove('hidden');
+    }
+  }
+
+  handleResize() {
+    const isSmallScreen = window.innerWidth <= 1024;
+    if (isSmallScreen && !this.panelHidden) {
+      // Keep showing the panel if it was explicitly opened
+      this.panel.classList.remove('hidden');
+    }
+  }
+}
+
+// Initialize tutorial
+const tutorial = new TutorialManager();
+
 // Animate
 function animate() {
   controls.update();
