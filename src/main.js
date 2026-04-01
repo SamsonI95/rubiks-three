@@ -19,17 +19,6 @@ camera.position.set(6, 6, 8);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-const ORBIT_ENABLED = false;
-
-// Orbit is disabled for UI-only cube navigation tests.
-controls.enabled = ORBIT_ENABLED;
-controls.enableRotate = ORBIT_ENABLED;
-controls.enablePan = ORBIT_ENABLED;
-controls.enableZoom = ORBIT_ENABLED;
-
-function setOrbitEnabled(enabled) {
-  controls.enabled = ORBIT_ENABLED && enabled;
-}
 
 // Prevent the browser context menu on right-click
 renderer.domElement.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -45,7 +34,6 @@ function startCubeDrag(e) {
   prev.x = e.clientX;
   prev.y = e.clientY;
   controls.enabled = false;
-  setOrbitEnabled(false);
 
   try {
     renderer.domElement.setPointerCapture(e.pointerId);
@@ -67,30 +55,31 @@ function stopCubeDrag(e) {
   }
 }
 
-// renderer.domElement.addEventListener("pointerdown", (e) => {
-//   // Right mouse button = 2
-//   if (e.button !== 2) return;
-//   startCubeDrag(e);
-// });
+renderer.domElement.addEventListener("pointerdown", (e) => {
+  // Right mouse button = 2
+  if (e.button !== 2) return;
+  startCubeDrag(e);
+});
 
-// renderer.domElement.addEventListener("pointerup", (e) => {
-//   stopCubeDrag(e);
-// });
+renderer.domElement.addEventListener("pointerup", (e) => {
+  stopCubeDrag(e);
+});
 
-// renderer.domElement.addEventListener("pointermove", (e) => {
-//   if (!isRightDragging) return;
-//   if (cubeDragPointerId !== e.pointerId) return;
+renderer.domElement.addEventListener("pointermove", (e) => {
+  if (!isRightDragging) return;
+  if (cubeDragPointerId !== e.pointerId) return;
 
-//   const dx = e.clientX - prev.x;
-//   const dy = e.clientY - prev.y;
+  const dx = e.clientX - prev.x;
+  const dy = e.clientY - prev.y;
 
-//   const speed = 0.005;
-//   rubiks.rotation.y += dx * speed;
-//   rubiks.rotation.x += dy * speed;
+  const speed = 0.005;
+  rubiks.rotation.y += dx * speed;
+  rubiks.rotation.x += dy * speed;
 
-//   prev.x = e.clientX;
-//   prev.y = e.clientY;
-// });
+  prev.x = e.clientX;
+  prev.y = e.clientY;
+});
+
 
 // Lights
 scene.add(new THREE.AmbientLight(0xffffff, 0.6));
@@ -302,7 +291,7 @@ function inferDragTurn(startHitWorld, dragVec2, picked) {
 
 renderer.domElement.addEventListener("pointerdown", (e) => {
   if (e.pointerType === "mouse" && e.button !== 0) return; // left click only for mouse
-
+  
   const rect = renderer.domElement.getBoundingClientRect();
   mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
   mouse.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
@@ -312,9 +301,9 @@ renderer.domElement.addEventListener("pointerdown", (e) => {
 
   if (!hits.length) {
     // Touch fallback: drag empty space to rotate the whole cube.
-    // if (e.pointerType === "touch") {
-    //   startCubeDrag(e);
-    // }
+    if (e.pointerType === "touch") {
+      startCubeDrag(e);
+    }
     return;
   }
 
@@ -323,10 +312,10 @@ renderer.domElement.addEventListener("pointerdown", (e) => {
   selectedCubie = hit.object;
   setHighlight(selectedCubie);
   pickedFace = extractPickedFaceFromHit(hit);
-  // if (!pickedFace && e.pointerType === "touch") {
-  //   startCubeDrag(e);
-  //   return;
-  // }
+  if (!pickedFace && e.pointerType === "touch") {
+    startCubeDrag(e);
+    return;
+  }
   leftDragState = {
     pointerId: e.pointerId,
     startX: e.clientX,
