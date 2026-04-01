@@ -19,66 +19,10 @@ camera.position.set(6, 6, 8);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+controls.enableRotate = false;
 
 // Prevent the browser context menu on right-click
 renderer.domElement.addEventListener("contextmenu", (e) => e.preventDefault());
-
-let isRightDragging = false;
-let cubeDragPointerId = null;
-let prev = { x: 0, y: 0 };
-
-function startCubeDrag(e) {
-  if (isRightDragging) return;
-  isRightDragging = true;
-  cubeDragPointerId = e.pointerId;
-  prev.x = e.clientX;
-  prev.y = e.clientY;
-  controls.enabled = false;
-
-  try {
-    renderer.domElement.setPointerCapture(e.pointerId);
-  } catch { }
-}
-
-function stopCubeDrag(e) {
-  if (!isRightDragging) return;
-  if (e && e.pointerId !== undefined && cubeDragPointerId !== e.pointerId) return;
-
-  isRightDragging = false;
-  cubeDragPointerId = null;
-  controls.enabled = !leftDragState;
-
-  if (e && e.pointerId !== undefined) {
-    try {
-      renderer.domElement.releasePointerCapture(e.pointerId);
-    } catch { }
-  }
-}
-
-renderer.domElement.addEventListener("pointerdown", (e) => {
-  // Right mouse button = 2
-  if (e.button !== 2) return;
-  startCubeDrag(e);
-});
-
-renderer.domElement.addEventListener("pointerup", (e) => {
-  stopCubeDrag(e);
-});
-
-renderer.domElement.addEventListener("pointermove", (e) => {
-  if (!isRightDragging) return;
-  if (cubeDragPointerId !== e.pointerId) return;
-
-  const dx = e.clientX - prev.x;
-  const dy = e.clientY - prev.y;
-
-  const speed = 0.005;
-  rubiks.rotation.y += dx * speed;
-  rubiks.rotation.x += dy * speed;
-
-  prev.x = e.clientX;
-  prev.y = e.clientY;
-});
 
 
 // Lights
@@ -300,10 +244,7 @@ renderer.domElement.addEventListener("pointerdown", (e) => {
   const hits = raycaster.intersectObjects(cubies, false);
 
   if (!hits.length) {
-    // Touch fallback: drag empty space to rotate the whole cube.
-    if (e.pointerType === "touch") {
-      startCubeDrag(e);
-    }
+    // No cube interaction on empty space
     return;
   }
 
@@ -312,10 +253,6 @@ renderer.domElement.addEventListener("pointerdown", (e) => {
   selectedCubie = hit.object;
   setHighlight(selectedCubie);
   pickedFace = extractPickedFaceFromHit(hit);
-  if (!pickedFace && e.pointerType === "touch") {
-    startCubeDrag(e);
-    return;
-  }
   leftDragState = {
     pointerId: e.pointerId,
     startX: e.clientX,
@@ -356,15 +293,14 @@ renderer.domElement.addEventListener("pointerup", (e) => {
   } catch { }
 
   leftDragState = null;
-  controls.enabled = !isRightDragging;
+  controls.enabled = false;
 });
 
 renderer.domElement.addEventListener("pointercancel", (e) => {
   if (leftDragState && leftDragState.pointerId === e.pointerId) {
     leftDragState = null;
   }
-  stopCubeDrag(e);
-  controls.enabled = !isRightDragging && !leftDragState;
+  controls.enabled = false;
 });
 
 
@@ -490,7 +426,7 @@ function rotateSlice(axis, layerIndex, dir, durationMs = 180) {
 }
 
 function rotateWholeCube(axis, dir, quarterTurns = 1, durationMs = 200) {
-  if (isCubeTurning || isRightDragging) return Promise.resolve(false);
+  if (isCubeTurning) return Promise.resolve(false);
   isCubeTurning = true;
 
   const fromX = rubiks.rotation.x;
